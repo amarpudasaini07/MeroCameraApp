@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -13,6 +14,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 loadCamera();
                 checkPermission();
+
             }
 
             private void loadCamera() {
@@ -59,8 +66,32 @@ public class MainActivity extends AppCompatActivity {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             imageview.setImageBitmap(imageBitmap);
+            saveImage(imageBitmap);
+        }
+    }
+
+    private void saveImage(Bitmap finalBitmap){
+        String root= Environment.getExternalStorageDirectory().toString();
+        File mydir = new File(root +"/saved_images");
+        mydir.mkdir();
+        Random generator=new Random();
+        int n=1000;
+        n= generator.nextInt(n);
+        String fname="image-"+n +".jpg";
+        File file = new File(mydir, fname);
+        if(file.exists()) file.delete();
+        try{
+            FileOutputStream out = new FileOutputStream(file);
+            finalBitmap.compress(Bitmap.CompressFormat.JPEG,90, out);
+            out.flush();
+            out.close();
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 
 
 }
+
+
+
